@@ -1,22 +1,20 @@
 package main
 
 type QueryData struct {
-	resultType string
-	result 	interface{}
+	ResultType string
+	Result     interface{}
 }
 
 type QueryResponse struct {
-	status	string
-	data	QueryData
+	Status string
+	Data   QueryData
 }
 
 type InstantVector struct {
-	metric map[string]string
-	value []interface{}
+	metric map[string]interface{}
+	value  []interface{}
 }
 
 type Metric struct {
 	name string
-	value float64
 }
-

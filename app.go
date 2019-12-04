@@ -2,22 +2,34 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/eclipse/paho.mqtt.golang"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
+
+	"github.com/eclipse/paho.mqtt.golang"
+	"github.com/tkanos/gonfig"
 )
 
+type Configuration struct {
+	PrometheusUrl string
+	Job           string
+	MqttUrl       string
+	MqttTopic     string
+}
+
 func main() {
-	prometheusUrl := "http://localhost"
-	mqttUrl := "tcp://localhost:1883"
-	mqttTopic := "test"
+	configuration := Configuration{}
+	err := gonfig.GetConf("config.json", &configuration)
+	if err != nil {
+		panic(err)
+	}
 
 	mqtt.DEBUG = log.New(os.Stdout, "", 0)
 	mqtt.ERROR = log.New(os.Stdout, "", 0)
-	opts := mqtt.NewClientOptions().AddBroker(mqttUrl)
+	opts := mqtt.NewClientOptions().AddBroker(configuration.MqttUrl)
 	opts.SetKeepAlive(2 * time.Second)
 	opts.SetPingTimeout(1 * time.Second)
 
@@ -26,47 +38,81 @@ func main() {
 		panic(token.Error())
 	}
 
-	queryResponse, err := query(prometheusUrl)
+	for {
+		for _, instanceValue := range getMetrics(configuration.PrometheusUrl, configuration.Job) {
+			name := instanceValue.metric["__name__"]
+			value := instanceValue.value[1].(string)
+
+			message := name.(string) + ":" + value
+			publish(c, configuration.MqttTopic, message)
+		}
+
+		time.Sleep(10 * time.Second)
+	}
+
+	c.Disconnect(250)
+}
+
+func getMetrics(prometheusUrl string, job string) []InstantVector {
+	queryResponse, err := query(prometheusUrl, job)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if queryResponse.status != "success" {
+	if queryResponse.Status != "success" {
 		log.Fatal("Query response not successful")
 	}
-	if queryResponse.data.resultType != "vector" {
+	if queryResponse.Data.ResultType != "vector" {
 		log.Fatal("Expected result type vector")
 	}
 
-	data  := queryResponse.data
-	var result = data.result.([]InstantVector)
+	data := queryResponse.Data
+	result := data.Result.([]interface{})
 
-	for _, instanceValue := range result {
-		name := instanceValue.metric["__name__"]
-		value := instanceValue.value[1].(string)
-
-		message := name + ":" + value
-		publish(c, mqttTopic, message)
+	ivs := []InstantVector{}
+	for _, i := range result {
+		j := i.(map[string]interface{})
+		x := j["metric"].(map[string]interface{})
+		y := j["value"].([]interface{})
+		ivs = append(ivs, InstantVector{metric: x, value: y})
 	}
 
-	c.Disconnect(250)
-	println("Done")
+	return ivs
+}
+func query(prometheusUrl string, job string) (*QueryResponse, error) {
+	queryUrl, err := url.Parse(prometheusUrl + "/api/v1/query")
+	if err != nil {
+		return nil, err
+	}
+
+	values, err := url.ParseQuery(queryUrl.RawQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	q := "{job=\"" + job + "\"}"
+	values.Add("query", q)
+	queryUrl.RawQuery = values.Encode()
+
+	body, err := httpFetch(queryUrl.String())
+	if err != nil {
+		return nil, err
+	}
+
+	queryResponse, err := unmarshallQueryResponse(body)
+	if err != nil {
+		return nil, err
+	}
+	return queryResponse, nil
 }
 
-func query(prometheusUrl string) (*QueryResponse, error) {
-	queryUrl := prometheusUrl + "/api/v1/query"
-
-	body, err := httpFetch(queryUrl)
+func unmarshallQueryResponse(body []byte) (*QueryResponse, error) {
+	queryResponse := &QueryResponse{}
+	err := json.Unmarshal(body, queryResponse)
 	if err != nil {
 		return nil, err
 	}
-
-	queryResponse := QueryResponse{}
-	err = json.Unmarshal(body, &queryResponse)
-	if err != nil {
-		return nil, err
-	}
-	return &queryResponse, nil
+	return queryResponse, nil
 }
 
 func httpFetch(url string) ([]byte, error) {
