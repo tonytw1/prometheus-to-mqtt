@@ -44,7 +44,7 @@ func main() {
 				name := instanceValue.metric["__name__"]
 				value := instanceValue.value[1].(string)
 
-				message := name.(string) + ":" + value
+				message := job + "_" + name.(string) + ":" + value
 				publish(c, configuration.MqttTopic, message)
 			}
 
