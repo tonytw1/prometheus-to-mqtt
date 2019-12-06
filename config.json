@@ -2,5 +2,5 @@
   "PrometheusUrl": "",
   "MqttUrl": "",
   "MqttTopic": "",
-  "Job":  ""
+  "Jobs": []
 }

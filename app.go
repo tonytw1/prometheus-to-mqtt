@@ -15,7 +15,7 @@ import (
 
 type Configuration struct {
 	PrometheusUrl string
-	Job           string
+	Jobs          []string
 	MqttUrl       string
 	MqttTopic     string
 }
@@ -39,14 +39,16 @@ func main() {
 	}
 
 	for {
-		for _, instanceValue := range getMetrics(configuration.PrometheusUrl, configuration.Job) {
-			name := instanceValue.metric["__name__"]
-			value := instanceValue.value[1].(string)
+		for _, job := range configuration.Jobs {
+			for _, instanceValue := range getMetrics(configuration.PrometheusUrl, job) {
+				name := instanceValue.metric["__name__"]
+				value := instanceValue.value[1].(string)
 
-			message := name.(string) + ":" + value
-			publish(c, configuration.MqttTopic, message)
+				message := name.(string) + ":" + value
+				publish(c, configuration.MqttTopic, message)
+			}
+
 		}
-
 		time.Sleep(10 * time.Second)
 	}
 
