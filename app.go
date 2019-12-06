@@ -27,7 +27,6 @@ func main() {
 		panic(err)
 	}
 
-	mqtt.DEBUG = log.New(os.Stdout, "", 0)
 	mqtt.ERROR = log.New(os.Stdout, "", 0)
 	opts := mqtt.NewClientOptions().AddBroker(configuration.MqttUrl)
 	opts.SetKeepAlive(2 * time.Second)
