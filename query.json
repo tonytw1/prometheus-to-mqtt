@@ -1,0 +1,110 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "vector",
+    "result": [
+      {
+        "metric": {
+          "__name__": "ALERTS",
+          "alertname": "AlwaysOnAlert",
+          "alertstate": "firing",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "ALERTS_FOR_STATE",
+          "alertname": "AlwaysOnAlert",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "1575718315"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "actual_intensity",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "180"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "forecast_intensity",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "182"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "scrape_duration_seconds",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "0.000760309"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "scrape_samples_post_metric_relabeling",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "2"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "scrape_samples_scraped",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "2"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "scrape_series_added",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "carbon-intensity-api-exporter:8080",
+          "job": "carbon-intensity"
+        },
+        "value": [
+          1575746770.02,
+          "1"
+        ]
+      }
+    ]
+  }
+}

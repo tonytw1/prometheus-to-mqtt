@@ -1,0 +1,65 @@
+{
+  "status": "success",
+  "data": {
+    "groups": [
+      {
+        "name": "carbon-intensity",
+        "file": "/etc/prometheus/rules.yml",
+        "rules": [
+          {
+            "name": "HighCarbonIntensity",
+            "query": "actual_intensity{job=\"carbon-intensity\"} \u003e 250",
+            "duration": 0,
+            "labels": {},
+            "annotations": {
+              "summary": "High carbon intensity"
+            },
+            "alerts": [],
+            "health": "ok",
+            "type": "alerting"
+          },
+          {
+            "name": "AlwaysOnAlert",
+            "query": "actual_intensity{job=\"carbon-intensity\"} \u003e 10",
+            "duration": 0,
+            "labels": {},
+            "annotations": {
+              "summary": "Always on test alert"
+            },
+            "alerts": [
+              {
+                "labels": {
+                  "alertname": "AlwaysOnAlert",
+                  "instance": "carbon-intensity-api-exporter:8080",
+                  "job": "carbon-intensity"
+                },
+                "annotations": {
+                  "summary": "Always on test alert"
+                },
+                "state": "firing",
+                "activeAt": "2019-12-07T11:31:55.576480047Z",
+                "value": "1.8e+02"
+              }
+            ],
+            "health": "ok",
+            "type": "alerting"
+          }
+        ],
+        "interval": 15
+      },
+      {
+        "name": "squadlist",
+        "file": "/etc/prometheus/rules.yml",
+        "rules": [
+          {
+            "name": "availability_set_total_day",
+            "query": "floor(increase(availability_set_total{job=\"squadlist\"}[1d]))",
+            "health": "ok",
+            "type": "recording"
+          }
+        ],
+        "interval": 15
+      }
+    ]
+  }
+}
