@@ -33,8 +33,8 @@ func Test_UnmarshallRulesResponse(t *testing.T) {
 	body, err := ioutil.ReadFile("rules.json")
 	require.NoError(t, err)
 
-	queryResponse, err := UnmarshallQueryResponse(body)
+	rulesResponse, err := UnmarshallRulesResponse(body)
 	require.NoError(t, err)
 
-	assert.Equal(t, "success", queryResponse.Status)
+	assert.Equal(t, "success", rulesResponse.Status)
 }

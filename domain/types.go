@@ -18,3 +18,12 @@ type InstantVector struct {
 type Metric struct {
 	Name string
 }
+
+type RulesData struct {
+	Groups interface{}
+}
+
+type RulesResponse struct {
+	Status string
+	Data   RulesData
+}

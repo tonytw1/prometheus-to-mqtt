@@ -36,3 +36,12 @@ func ExtractMetricsFromQueryResponse(queryResponse *domain.QueryResponse) []doma
 
 	return ivs
 }
+
+func UnmarshallRulesResponse(body []byte) (*domain.RulesResponse, error) {
+	rulesResponse := &domain.RulesResponse{}
+	err := json.Unmarshal(body, rulesResponse)
+	if err != nil {
+		return nil, err
+	}
+	return rulesResponse, nil
+}
