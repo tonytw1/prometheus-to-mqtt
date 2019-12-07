@@ -1,0 +1,18 @@
+package prometheus
+
+import (
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"io/ioutil"
+	"testing"
+)
+
+func Test_UnmarshallMetricsQueryResponse(t *testing.T) {
+	body, err := ioutil.ReadFile("query.json")
+	require.NoError(t, err)
+
+	queryResponse, err := UnmarshallQueryResponse(body)
+	require.NoError(t, err)
+
+	assert.Equal(t, "success", queryResponse.Status)
+}
