@@ -1,4 +1,4 @@
-package main
+package domain
 
 type QueryData struct {
 	ResultType string
@@ -11,10 +11,10 @@ type QueryResponse struct {
 }
 
 type InstantVector struct {
-	metric map[string]interface{}
-	value  []interface{}
+	Metric map[string]interface{}
+	Value  []interface{}
 }
 
 type Metric struct {
-	name string
+	Name string
 }

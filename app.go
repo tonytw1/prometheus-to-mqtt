@@ -1,7 +1,8 @@
 package main
 
 import (
-	"encoding/json"
+	"github.com/tonytw1/prometheus-to-mqtt/domain"
+	"github.com/tonytw1/prometheus-to-mqtt/prometheus"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -40,8 +41,8 @@ func main() {
 	for {
 		for _, job := range configuration.Jobs {
 			for _, instanceValue := range getMetrics(configuration.PrometheusUrl, job) {
-				name := instanceValue.metric["__name__"]
-				value := instanceValue.value[1].(string)
+				name := instanceValue.Metric["__name__"]
+				value := instanceValue.Value[1].(string)
 
 				message := job + "_" + name.(string) + ":" + value
 				publish(c, configuration.MqttTopic, message)
@@ -54,7 +55,7 @@ func main() {
 	c.Disconnect(250)
 }
 
-func getMetrics(prometheusUrl string, job string) []InstantVector {
+func getMetrics(prometheusUrl string, job string) []domain.InstantVector {
 	queryResponse, err := query(prometheusUrl, job)
 	if err != nil {
 		log.Fatal(err)
@@ -70,17 +71,17 @@ func getMetrics(prometheusUrl string, job string) []InstantVector {
 	data := queryResponse.Data
 	result := data.Result.([]interface{})
 
-	ivs := []InstantVector{}
+	ivs := []domain.InstantVector{}
 	for _, i := range result {
 		j := i.(map[string]interface{})
 		x := j["metric"].(map[string]interface{})
 		y := j["value"].([]interface{})
-		ivs = append(ivs, InstantVector{metric: x, value: y})
+		ivs = append(ivs, domain.InstantVector{Metric: x, Value: y})
 	}
 
 	return ivs
 }
-func query(prometheusUrl string, job string) (*QueryResponse, error) {
+func query(prometheusUrl string, job string) (*domain.QueryResponse, error) {
 	queryUrl, err := url.Parse(prometheusUrl + "/api/v1/query")
 	if err != nil {
 		return nil, err
@@ -100,16 +101,7 @@ func query(prometheusUrl string, job string) (*QueryResponse, error) {
 		return nil, err
 	}
 
-	queryResponse, err := unmarshallQueryResponse(body)
-	if err != nil {
-		return nil, err
-	}
-	return queryResponse, nil
-}
-
-func unmarshallQueryResponse(body []byte) (*QueryResponse, error) {
-	queryResponse := &QueryResponse{}
-	err := json.Unmarshal(body, queryResponse)
+	queryResponse, err := prometheus.UnmarshallQueryResponse(body)
 	if err != nil {
 		return nil, err
 	}
