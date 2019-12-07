@@ -16,3 +16,15 @@ func Test_UnmarshallMetricsQueryResponse(t *testing.T) {
 
 	assert.Equal(t, "success", queryResponse.Status)
 }
+
+func Test_ExtractMetricsFromQueryResponse(t *testing.T) {
+	body, err := ioutil.ReadFile("query.json")
+	require.NoError(t, err)
+
+	queryResponse, err := UnmarshallQueryResponse(body)
+	require.NoError(t, err)
+
+	response := ExtractMetricsFromQueryResponse(queryResponse)
+
+	assert.Equal(t, 9, len(response))
+}

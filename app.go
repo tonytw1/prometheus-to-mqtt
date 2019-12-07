@@ -61,26 +61,9 @@ func getMetrics(prometheusUrl string, job string) []domain.InstantVector {
 		log.Fatal(err)
 	}
 
-	if queryResponse.Status != "success" {
-		log.Fatal("Query response not successful")
-	}
-	if queryResponse.Data.ResultType != "vector" {
-		log.Fatal("Expected result type vector")
-	}
-
-	data := queryResponse.Data
-	result := data.Result.([]interface{})
-
-	ivs := []domain.InstantVector{}
-	for _, i := range result {
-		j := i.(map[string]interface{})
-		x := j["metric"].(map[string]interface{})
-		y := j["value"].([]interface{})
-		ivs = append(ivs, domain.InstantVector{Metric: x, Value: y})
-	}
-
-	return ivs
+	return prometheus.ExtractMetricsFromQueryResponse(queryResponse)
 }
+
 func query(prometheusUrl string, job string) (*domain.QueryResponse, error) {
 	queryUrl, err := url.Parse(prometheusUrl + "/api/v1/query")
 	if err != nil {
