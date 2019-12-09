@@ -37,4 +37,12 @@ func Test_UnmarshallRulesResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "success", rulesResponse.Status)
+
+	assert.Equal(t, 2, len(rulesResponse.Data.Groups))
+	firstGroup := rulesResponse.Data.Groups[0]
+	assert.Equal(t, "carbon-intensity", firstGroup.Name)
+
+	assert.Equal(t, 2, len(firstGroup.Rules))
+	rule := firstGroup.Rules[0]
+	assert.Equal(t, "HighCarbonIntensity", rule.Name)
 }

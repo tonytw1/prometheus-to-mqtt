@@ -19,8 +19,17 @@ type Metric struct {
 	Name string
 }
 
+type Rule struct {
+	Name string
+}
+
+type Group struct {
+	Name  string
+	Rules []Rule
+}
+
 type RulesData struct {
-	Groups interface{}
+	Groups []Group
 }
 
 type RulesResponse struct {
