@@ -43,6 +43,9 @@ func Test_UnmarshallRulesResponse(t *testing.T) {
 	assert.Equal(t, "carbon-intensity", firstGroup.Name)
 
 	assert.Equal(t, 2, len(firstGroup.Rules))
-	rule := firstGroup.Rules[0]
-	assert.Equal(t, "HighCarbonIntensity", rule.Name)
+	rule := firstGroup.Rules[1]
+	assert.Equal(t, "AlwaysOnAlert", rule.Name)
+
+	// Alerting rules have an alerts field
+	assert.Equal(t, 1, len(rule.Alerts))
 }

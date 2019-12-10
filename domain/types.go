@@ -19,8 +19,13 @@ type Metric struct {
 	Name string
 }
 
+type Alert struct {
+	State string
+}
+
 type Rule struct {
-	Name string
+	Name   string
+	Alerts []Alert
 }
 
 type Group struct {
