@@ -43,9 +43,12 @@ func Test_UnmarshallRulesResponse(t *testing.T) {
 	assert.Equal(t, "carbon-intensity", firstGroup.Name)
 
 	assert.Equal(t, 2, len(firstGroup.Rules))
-	rule := firstGroup.Rules[1]
-	assert.Equal(t, "AlwaysOnAlert", rule.Name)
+	alertingRule := firstGroup.Rules[1]
+	assert.Equal(t, "AlwaysOnAlert", alertingRule.Name)
+	assert.Equal(t, "alerting", alertingRule.Type)
 
 	// Alerting rules have an alerts field
-	assert.Equal(t, 1, len(rule.Alerts))
+	assert.Equal(t, 1, len(alertingRule.Alerts))
+	alert := alertingRule.Alerts[0]
+	assert.Equal(t, "firing", alert.State, "We can tell if an alert is currently firing by looking at the state field")
 }

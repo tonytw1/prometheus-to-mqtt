@@ -26,6 +26,7 @@ type Alert struct {
 type Rule struct {
 	Name   string
 	Alerts []Alert
+	Type   string
 }
 
 type Group struct {

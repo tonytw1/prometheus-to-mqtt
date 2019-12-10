@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/tonytw1/prometheus-to-mqtt/domain"
-	"github.com/tonytw1/prometheus-to-mqtt/prometheus"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +10,9 @@ import (
 
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/tkanos/gonfig"
+
+	"github.com/tonytw1/prometheus-to-mqtt/domain"
+	"github.com/tonytw1/prometheus-to-mqtt/prometheus"
 )
 
 type Configuration struct {
@@ -39,7 +40,9 @@ func main() {
 	}
 
 	for {
+		// Publish metrics for each configured job
 		for _, job := range configuration.Jobs {
+			// Metrics
 			for _, instanceValue := range getMetrics(configuration.PrometheusUrl, job) {
 				name := instanceValue.Metric["__name__"]
 				value := instanceValue.Value[1].(string)
@@ -49,6 +52,25 @@ func main() {
 			}
 
 		}
+
+		// Publish state of alerts - TODO are rules selectable by job?
+		for _, rule := range getRules(configuration.PrometheusUrl) {
+			isAlertingRule := rule.Type == "alerting"
+			if !isAlertingRule {
+				continue
+			}
+
+			alertState := "0"
+			for _, alert := range rule.Alerts {
+				if alert.State == "firing" {
+					alertState = "1"
+					break
+				}
+			}
+			message := rule.Name + ":" + alertState
+			publish(c, configuration.MqttTopic, message)
+		}
+
 		time.Sleep(10 * time.Second)
 	}
 
@@ -62,6 +84,10 @@ func getMetrics(prometheusUrl string, job string) []domain.InstantVector {
 	}
 
 	return prometheus.ExtractMetricsFromQueryResponse(queryResponse)
+}
+
+func getRules(prometheusUrl string) []domain.Rule {
+	return []domain.Rule{}
 }
 
 func query(prometheusUrl string, job string) (*domain.QueryResponse, error) {
