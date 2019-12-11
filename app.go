@@ -62,8 +62,14 @@ func main() {
 
 		}
 
-		// Publish state of alerts - TODO are rules selectable by job?
-		for _, rule := range prometheus.GetRules(prometheusUrl) {
+		// Publish state of alerts
+		// TODO are rules selectable by job?
+		rules, err := prometheus.GetRules(prometheusUrl)
+		if err != nil {
+			log.Print("Error getting rules", err)
+			continue
+		}
+		for _, rule := range rules {
 			isAlertingRule := rule.Type == "alerting"
 			if !isAlertingRule {
 				continue

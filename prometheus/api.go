@@ -16,15 +16,29 @@ var client = http.Client{
 func GetMetrics(prometheusUrl string, job string) ([]domain.InstantVector, error) {
 	queryResponse, err := query(prometheusUrl, job)
 	if err != nil {
-		log.Print("Error while fetching", err)
+		log.Print("Error while fetching metrics", err)
 		return nil, err
 	}
 
 	return ExtractMetricsFromQueryResponse(queryResponse)
 }
 
-func GetRules(prometheusUrl string) []domain.Rule {
-	return []domain.Rule{} // TODO implement
+func GetRules(prometheusUrl string) ([]domain.Rule, error) {
+	rulesResponse, err := rules(prometheusUrl)
+	if err != nil {
+		log.Print("Error while fetching rules", err)
+		return nil, err
+	}
+
+	// TODO status check
+
+	var rules []domain.Rule
+	for _, group := range rulesResponse.Data.Groups {
+		for _, rule := range group.Rules {
+			rules = append(rules, rule) // TODO Is there really no append collection function?
+		}
+	}
+	return rules, nil
 }
 
 func query(prometheusUrl string, job string) (*domain.QueryResponse, error) {
@@ -38,24 +52,34 @@ func query(prometheusUrl string, job string) (*domain.QueryResponse, error) {
 		return nil, err
 	}
 
-	q := "{job=\"" + job + "\"}"
+	q := "{job=\"" + job + "\"}" // TODO make safe
 	values.Add("query", q)
 	queryUrl.RawQuery = values.Encode()
 
-	body, err := httpFetch(queryUrl.String())
+	body, err := httpFetch(queryUrl)
 	if err != nil {
 		return nil, err
 	}
 
-	queryResponse, err := UnmarshallQueryResponse(body)
-	if err != nil {
-		return nil, err
-	}
-	return queryResponse, nil
+	return UnmarshallQueryResponse(body)
 }
 
-func httpFetch(url string) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+func rules(prometheusUrl string) (*domain.RulesResponse, error) {
+	rulesUrl, err := url.Parse(prometheusUrl + "/api/v1/rules")
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := httpFetch(rulesUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	return UnmarshallRulesResponse(body)
+}
+
+func httpFetch(url *url.URL) ([]byte, error) {
+	req, err := http.NewRequest(http.MethodGet, url.String(), nil)
 	if err != nil {
 		return nil, err
 	}
