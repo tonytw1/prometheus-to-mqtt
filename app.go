@@ -22,6 +22,10 @@ type Configuration struct {
 	MqttTopic     string
 }
 
+var client = http.Client{
+	Timeout: time.Second * 5,
+}
+
 func main() {
 	configuration := Configuration{}
 	err := gonfig.GetConf("config.json", &configuration)
@@ -121,10 +125,6 @@ func httpFetch(url string) ([]byte, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
-	}
-
-	client := http.Client{
-		Timeout: time.Second * 5,
 	}
 
 	res, getErr := client.Do(req)
