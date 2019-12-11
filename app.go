@@ -57,7 +57,7 @@ func main() {
 				name := instanceValue.Metric["__name__"]
 				value := instanceValue.Value[1].(string)
 
-				message := job + "_" + name.(string) + ":" + value
+				message := formatMessage(job, name.(string), value)
 				publish(c, configuration.MqttTopic, message)
 			}
 
@@ -77,14 +77,17 @@ func main() {
 					break
 				}
 			}
-			message := rule.Name + ":" + alertState
-			publish(c, configuration.MqttTopic, message)
+			publish(c, configuration.MqttTopic, formatMessage("", rule.Name, alertState)) // TODO job
 		}
 
 		time.Sleep(10 * time.Second)
 	}
 
 	c.Disconnect(250)
+}
+
+func formatMessage(job string, name string, value string) string {
+	return job + "_" + name + ":" + value // TODO make safe
 }
 
 func getMetrics(prometheusUrl string, job string) ([]domain.InstantVector, error) {
