@@ -39,6 +39,8 @@ func main() {
 	opts.SetPingTimeout(1 * time.Second)
 
 	c := mqtt.NewClient(opts)
+	defer c.Disconnect(250)
+
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
@@ -82,8 +84,6 @@ func main() {
 
 		time.Sleep(10 * time.Second)
 	}
-
-	c.Disconnect(250)
 }
 
 func formatMessage(job string, name string, value string) string {
