@@ -33,8 +33,13 @@ func main() {
 		panic(err)
 	}
 
+	prometheusUrl := configuration.PrometheusUrl
+	jobs := configuration.Jobs
+	mqttURL := configuration.MqttUrl
+	topic := configuration.MqttTopic
+
 	mqtt.ERROR = log.New(os.Stdout, "", 0)
-	opts := mqtt.NewClientOptions().AddBroker(configuration.MqttUrl)
+	opts := mqtt.NewClientOptions().AddBroker(mqttURL)
 	opts.SetKeepAlive(2 * time.Second)
 	opts.SetPingTimeout(1 * time.Second)
 
@@ -47,9 +52,9 @@ func main() {
 
 	for {
 		// Publish metrics for each configured job
-		for _, job := range configuration.Jobs {
+		for _, job := range jobs {
 			// Metrics
-			vectors, err := getMetrics(configuration.PrometheusUrl, job)
+			vectors, err := getMetrics(prometheusUrl, job)
 			if err != nil {
 				log.Print("Error getting metrics", err)
 				continue
@@ -60,13 +65,13 @@ func main() {
 				value := instanceValue.Value[1].(string)
 
 				message := formatMessage(job, name.(string), value)
-				publish(c, configuration.MqttTopic, message)
+				publish(c, topic, message)
 			}
 
 		}
 
 		// Publish state of alerts - TODO are rules selectable by job?
-		for _, rule := range getRules(configuration.PrometheusUrl) {
+		for _, rule := range getRules(prometheusUrl) {
 			isAlertingRule := rule.Type == "alerting"
 			if !isAlertingRule {
 				continue
@@ -79,7 +84,7 @@ func main() {
 					break
 				}
 			}
-			publish(c, configuration.MqttTopic, formatMessage("", rule.Name, alertState)) // TODO job
+			publish(c, topic, formatMessage("", rule.Name, alertState)) // TODO job
 		}
 
 		time.Sleep(10 * time.Second)
