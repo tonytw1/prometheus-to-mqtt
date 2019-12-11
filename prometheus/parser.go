@@ -15,12 +15,14 @@ func UnmarshallQueryResponse(body []byte) (*domain.QueryResponse, error) {
 	return queryResponse, nil
 }
 
-func ExtractMetricsFromQueryResponse(queryResponse *domain.QueryResponse) []domain.InstantVector {
+func ExtractMetricsFromQueryResponse(queryResponse *domain.QueryResponse) ([]domain.InstantVector, error) {
 	if queryResponse.Status != "success" {
-		log.Fatal("Query response not successful")
+		log.Print("Query response not successful")
+		return nil, nil
 	}
 	if queryResponse.Data.ResultType != "vector" {
-		log.Fatal("Expected result type vector")
+		log.Print("Expected result type vector")
+		return nil, nil
 	}
 
 	data := queryResponse.Data
@@ -29,12 +31,12 @@ func ExtractMetricsFromQueryResponse(queryResponse *domain.QueryResponse) []doma
 	ivs := []domain.InstantVector{}
 	for _, i := range result {
 		j := i.(map[string]interface{})
-		x := j["metric"].(map[string]interface{})
-		y := j["value"].([]interface{})
-		ivs = append(ivs, domain.InstantVector{Metric: x, Value: y})
+		ivs = append(ivs, domain.InstantVector{
+			Metric: j["metric"].(map[string]interface{}),
+			Value:  j["value"].([]interface{})})
 	}
 
-	return ivs
+	return ivs, nil
 }
 
 func UnmarshallRulesResponse(body []byte) (*domain.RulesResponse, error) {

@@ -47,7 +47,13 @@ func main() {
 		// Publish metrics for each configured job
 		for _, job := range configuration.Jobs {
 			// Metrics
-			for _, instanceValue := range getMetrics(configuration.PrometheusUrl, job) {
+			vectors, err := getMetrics(configuration.PrometheusUrl, job)
+			if err != nil {
+				log.Print("Error getting metrics", err)
+				continue
+			}
+
+			for _, instanceValue := range vectors {
 				name := instanceValue.Metric["__name__"]
 				value := instanceValue.Value[1].(string)
 
@@ -81,10 +87,11 @@ func main() {
 	c.Disconnect(250)
 }
 
-func getMetrics(prometheusUrl string, job string) []domain.InstantVector {
+func getMetrics(prometheusUrl string, job string) ([]domain.InstantVector, error) {
 	queryResponse, err := query(prometheusUrl, job)
 	if err != nil {
-		log.Fatal(err)
+		log.Print("Error while fetching", err)
+		return nil, err
 	}
 
 	return prometheus.ExtractMetricsFromQueryResponse(queryResponse)

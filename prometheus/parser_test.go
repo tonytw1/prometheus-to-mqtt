@@ -24,7 +24,8 @@ func Test_ExtractMetricsFromQueryResponse(t *testing.T) {
 	queryResponse, err := UnmarshallQueryResponse(body)
 	require.NoError(t, err)
 
-	response := ExtractMetricsFromQueryResponse(queryResponse)
+	response, err := ExtractMetricsFromQueryResponse(queryResponse)
+	require.NoError(t, err)
 
 	assert.Equal(t, 9, len(response))
 }
