@@ -84,15 +84,10 @@ func httpFetch(url *url.URL) ([]byte, error) {
 		return nil, err
 	}
 
-	res, getErr := client.Do(req)
-	if getErr != nil {
+	res, err := client.Do(req)
+	if err != nil {
 		return nil, err
 	}
 
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		return nil, err
-	}
-
-	return body, nil
+	return ioutil.ReadAll(res.Body)
 }
