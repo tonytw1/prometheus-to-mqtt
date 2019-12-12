@@ -75,10 +75,10 @@ func main() {
 				continue
 			}
 
-			alertState := "0"
+			alertState := "false"
 			for _, alert := range rule.Alerts {
 				if alert.State == "firing" {
-					alertState = "1"
+					alertState = "true"
 					break
 				}
 			}

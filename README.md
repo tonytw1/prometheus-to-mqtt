@@ -15,6 +15,6 @@ Alerts are published in the same format with a value of 0 or 1 to indicate if th
 currently firing.
 
 ```
-[alert name]:[0|1]
+[alert name]:[true|false]
 ```
 
