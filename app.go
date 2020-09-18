@@ -32,8 +32,8 @@ func main() {
 
 	mqtt.ERROR = log.New(os.Stdout, "", 0)
 	opts := mqtt.NewClientOptions().AddBroker(mqttURL)
-	opts.SetKeepAlive(2 * time.Second)
-	opts.SetPingTimeout(1 * time.Second)
+	opts.SetKeepAlive(10 * time.Second)
+	opts.SetPingTimeout(10 * time.Second)
 
 	c := mqtt.NewClient(opts)
 	defer c.Disconnect(250)
