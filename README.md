@@ -1,6 +1,6 @@
 # Prometheus to MQTT
 
-Polls Prometheus and exports metrics and alerts for a given of jobs onto an MQTT topic.
+Polls Prometheus and exports metrics and alerts for a given set of jobs onto an MQTT topic.
 
 We use Prometheus for monitoring and alerting but have several dashboard devices which 
 consumer metrics from a MQTT topic.

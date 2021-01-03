@@ -31,9 +31,21 @@ func main() {
 	topic := configuration.MqttTopic
 
 	mqtt.ERROR = log.New(os.Stdout, "", 0)
+
+	var onConnectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
+		log.Print("Connected")
+	}
+
+	var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
+		log.Print("Disconnected with error", err)
+	}
+
 	opts := mqtt.NewClientOptions().AddBroker(mqttURL)
 	opts.SetKeepAlive(10 * time.Second)
 	opts.SetPingTimeout(10 * time.Second)
+	opts.SetOnConnectHandler(onConnectHandler)
+	opts.SetConnectionLostHandler(connectionLostHandler)
+	opts.SetAutoReconnect(true)
 
 	c := mqtt.NewClient(opts)
 	defer c.Disconnect(250)
