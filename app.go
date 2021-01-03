@@ -46,6 +46,7 @@ func main() {
 	opts.SetOnConnectHandler(onConnectHandler)
 	opts.SetConnectionLostHandler(connectionLostHandler)
 	opts.SetAutoReconnect(true)
+	opts.SetMaxReconnectInterval(time.Second * 60)
 
 	c := mqtt.NewClient(opts)
 	defer c.Disconnect(250)
