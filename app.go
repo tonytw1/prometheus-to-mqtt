@@ -32,16 +32,16 @@ func main() {
 
 	mqtt.ERROR = log.New(os.Stdout, "", 0)
 
-	var onConnectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
+	var logConnection mqtt.OnConnectHandler = func(client mqtt.Client) {
 		log.Print("Connected")
 	}
 
 	opts := mqtt.NewClientOptions().AddBroker(mqttURL)
 	opts.SetKeepAlive(10 * time.Second)
 	opts.SetPingTimeout(10 * time.Second)
-	opts.SetOnConnectHandler(onConnectHandler)
-	opts.SetAutoReconnect(true)
-	opts.SetMaxReconnectInterval(time.Second * 60)
+	opts.SetOnConnectHandler(logConnection)
+	opts.SetCleanSession(true)
+	opts.SetClientID("prometheus-to-mqtt")
 
 	c := mqtt.NewClient(opts)
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
