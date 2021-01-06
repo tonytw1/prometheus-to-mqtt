@@ -36,24 +36,18 @@ func main() {
 		log.Print("Connected")
 	}
 
-	var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-		log.Print("Disconnected with error", err)
-	}
-
 	opts := mqtt.NewClientOptions().AddBroker(mqttURL)
 	opts.SetKeepAlive(10 * time.Second)
 	opts.SetPingTimeout(10 * time.Second)
 	opts.SetOnConnectHandler(onConnectHandler)
-	opts.SetConnectionLostHandler(connectionLostHandler)
 	opts.SetAutoReconnect(true)
 	opts.SetMaxReconnectInterval(time.Second * 60)
 
 	c := mqtt.NewClient(opts)
-	defer c.Disconnect(250)
-
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
+	defer c.Disconnect(250)
 
 	for {
 		// Publish metrics for each configured job
