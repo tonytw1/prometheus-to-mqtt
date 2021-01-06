@@ -42,7 +42,9 @@ func main() {
 	opts.SetOnConnectHandler(logConnection)
 	opts.SetCleanSession(true)
 	opts.SetClientID("prometheus-to-mqtt")
+	opts.SetAutoReconnect(true)
 
+	println("Connecting to: ", mqttURL)
 	c := mqtt.NewClient(opts)
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
@@ -50,6 +52,7 @@ func main() {
 	defer c.Disconnect(250)
 
 	for {
+		println("Polling")
 		// Publish metrics for each configured job
 		for _, job := range jobs {
 			// Metrics
@@ -103,6 +106,7 @@ func formatMessage(job string, name string, value string) string {
 }
 
 func publish(c mqtt.Client, topic string, message string) {
+	println("Publishing: " + message)
 	token := c.Publish(topic, 0, false, message)
 	token.WaitTimeout(time.Second * 1)
 }
