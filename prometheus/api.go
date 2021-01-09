@@ -15,10 +15,14 @@ var client = http.Client{
 }
 
 func GetMetrics(prometheusUrl string, job string) ([]domain.InstantVector, error) {
-	queryResponse, err := query(prometheusUrl, job)
+	queryResponse, err := fetchMetrics(prometheusUrl, job)
 	if err != nil {
 		log.Print("Error while fetching metrics", err)
 		return nil, err
+	}
+
+	if queryResponse.Status != "success" {
+		return nil, errors.New("Query response status was not success")
 	}
 
 	return ExtractMetricsFromQueryResponse(queryResponse)
@@ -44,7 +48,7 @@ func GetRules(prometheusUrl string) ([]domain.Rule, error) {
 	return rules, nil
 }
 
-func query(prometheusUrl string, job string) (*domain.QueryResponse, error) {
+func fetchMetrics(prometheusUrl string, job string) (*domain.QueryResponse, error) {
 	queryUrl, err := url.Parse(prometheusUrl + "/api/v1/query")
 	if err != nil {
 		return nil, err
