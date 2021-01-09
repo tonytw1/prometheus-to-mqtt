@@ -56,6 +56,7 @@ func main() {
 		// Publish metrics for each configured job
 		for _, job := range jobs {
 			// Metrics
+			println("Getting metrics for job: " + job)
 			vectors, err := prometheus.GetMetrics(prometheusUrl, job)
 			if err != nil {
 				log.Print("Error getting metrics", err)
@@ -65,9 +66,7 @@ func main() {
 			for _, instanceValue := range vectors {
 				name := instanceValue.Metric["__name__"]
 				value := instanceValue.Value[1].(string)
-
-				message := formatMessage(job, name.(string), value)
-				publish(c, topic, message)
+				publish(c, topic, formatMessage(job, name.(string), value))
 			}
 
 		}
@@ -85,6 +84,7 @@ func main() {
 				continue
 			}
 
+			println("Getting status of alerting rule: " + rule.Name)
 			alertState := "false"
 			for _, alert := range rule.Alerts {
 				if alert.State == "firing" {
@@ -92,7 +92,7 @@ func main() {
 					break
 				}
 			}
-			publish(c, topic, formatMessage("", rule.Name, alertState)) // TODO job
+			publish(c, topic, formatMessage("", rule.Name, alertState)) // TODO prefix with job name
 		}
 
 		time.Sleep(10 * time.Second)
