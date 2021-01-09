@@ -1,6 +1,7 @@
 package prometheus
 
 import (
+	"errors"
 	"github.com/tonytw1/prometheus-to-mqtt/domain"
 	"io/ioutil"
 	"log"
@@ -30,7 +31,9 @@ func GetRules(prometheusUrl string) ([]domain.Rule, error) {
 		return nil, err
 	}
 
-	// TODO status check
+	if rulesResponse.Status != "success" {
+		return nil, errors.New("Rules response status was not success")
+	}
 
 	var rules []domain.Rule
 	for _, group := range rulesResponse.Data.Groups {
