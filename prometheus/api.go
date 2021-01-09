@@ -24,7 +24,7 @@ func GetMetrics(prometheusUrl string, job string) ([]domain.InstantVector, error
 }
 
 func GetRules(prometheusUrl string) ([]domain.Rule, error) {
-	rulesResponse, err := rules(prometheusUrl)
+	rulesResponse, err := fetchRules(prometheusUrl)
 	if err != nil {
 		log.Print("Error while fetching rules", err)
 		return nil, err
@@ -35,7 +35,7 @@ func GetRules(prometheusUrl string) ([]domain.Rule, error) {
 	var rules []domain.Rule
 	for _, group := range rulesResponse.Data.Groups {
 		for _, rule := range group.Rules {
-			rules = append(rules, rule) // TODO Is there really no append collection function?
+			rules = append(rules, rule)
 		}
 	}
 	return rules, nil
@@ -64,7 +64,7 @@ func query(prometheusUrl string, job string) (*domain.QueryResponse, error) {
 	return UnmarshallQueryResponse(body)
 }
 
-func rules(prometheusUrl string) (*domain.RulesResponse, error) {
+func fetchRules(prometheusUrl string) (*domain.RulesResponse, error) {
 	rulesUrl, err := url.Parse(prometheusUrl + "/api/v1/rules")
 	if err != nil {
 		return nil, err
