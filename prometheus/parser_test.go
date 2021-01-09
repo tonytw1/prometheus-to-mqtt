@@ -41,6 +41,8 @@ func Test_UnmarshallRulesResponse(t *testing.T) {
 
 	assert.Equal(t, 2, len(rulesResponse.Data.Groups))
 	firstGroup := rulesResponse.Data.Groups[0]
+
+	// The job a rule belongs to can be found on the name of the group the rule belongs in
 	assert.Equal(t, "carbon-intensity", firstGroup.Name)
 
 	assert.Equal(t, 2, len(firstGroup.Rules))
