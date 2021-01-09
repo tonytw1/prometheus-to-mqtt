@@ -28,7 +28,7 @@ func GetMetrics(prometheusUrl string, job string) ([]domain.InstantVector, error
 	return ExtractMetricsFromQueryResponse(queryResponse)
 }
 
-func GetRules(prometheusUrl string) ([]domain.Rule, error) {
+func GetRuleGroups(prometheusUrl string) ([]domain.Group, error) {
 	rulesResponse, err := fetchRules(prometheusUrl)
 	if err != nil {
 		log.Print("Error while fetching rules", err)
@@ -39,13 +39,7 @@ func GetRules(prometheusUrl string) ([]domain.Rule, error) {
 		return nil, errors.New("Rules response status was not success")
 	}
 
-	var rules []domain.Rule
-	for _, group := range rulesResponse.Data.Groups {
-		for _, rule := range group.Rules {
-			rules = append(rules, rule)
-		}
-	}
-	return rules, nil
+	return rulesResponse.Data.Groups, nil
 }
 
 func fetchMetrics(prometheusUrl string, job string) (*domain.QueryResponse, error) {

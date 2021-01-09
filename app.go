@@ -72,27 +72,28 @@ func main() {
 		}
 
 		// Publish state of alerts
-		// TODO are rules selectable by job?
-		rules, err := prometheus.GetRules(prometheusUrl)
+		ruleGroups, err := prometheus.GetRuleGroups(prometheusUrl)
 		if err != nil {
 			log.Print("Error getting rules", err)
 			continue
 		}
-		for _, rule := range rules {
-			isAlertingRule := rule.Type == "alerting"
-			if !isAlertingRule {
-				continue
-			}
 
-			println("Getting status of alerting rule: " + rule.Name)
-			alertState := "false"
-			for _, alert := range rule.Alerts {
-				if alert.State == "firing" {
-					alertState = "true"
-					break
+		for _, group := range ruleGroups {
+			job := group.Name
+			for _, rule := range group.Rules {
+				isAlertingRule := rule.Type == "alerting"
+				if !isAlertingRule {
+					continue
 				}
+				alertState := "false"
+				for _, alert := range rule.Alerts {
+					if alert.State == "firing" {
+						alertState = "true"
+						break
+					}
+				}
+				publish(c, topic, formatMessage(job, rule.Name, alertState))
 			}
-			publish(c, topic, formatMessage("", rule.Name, alertState)) // TODO prefix with job name
 		}
 
 		time.Sleep(10 * time.Second)
