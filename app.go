@@ -54,6 +54,9 @@ func main() {
 	opts.SetCleanSession(true)
 	opts.SetClientID("prometheus-to-mqtt")
 	opts.SetAutoReconnect(true)
+	opts.SetConnectTimeout(time.Second * 10)
+	opts.SetConnectTimeout(time.Second * 60)
+	opts.SetMaxReconnectInterval(time.Second * 10)
 
 	println("Connecting to: ", mqttURL)
 	c := mqtt.NewClient(opts)
