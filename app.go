@@ -110,5 +110,6 @@ func formatMessage(job string, name string, value string) string {
 
 func publish(c mqtt.Client, topic string, message string) {
 	token := c.Publish(topic, 0, false, message)
+	println(token.Error())
 	token.WaitTimeout(time.Second * 1)
 }
