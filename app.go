@@ -48,13 +48,11 @@ func main() {
 	opts.SetOnConnectHandler(logConnection)
 	opts.SetConnectionLostHandler(logConnectionLost)
 	opts.SetReconnectingHandler(logReconnecting)
-	opts.SetConnectRetryInterval(time.Second * 5)
-	opts.SetCleanSession(true)
 	opts.SetClientID("prometheus-to-mqtt")
-	opts.SetAutoReconnect(true)
-	opts.SetConnectTimeout(time.Second * 10)
-	opts.SetWriteTimeout(time.Second * 1)
-	opts.SetMaxReconnectInterval(time.Second * 10)
+
+	mqtt.ERROR = log.New(os.Stdout, "[ERROR] ", 0)
+	mqtt.CRITICAL = log.New(os.Stdout, "[CRIT] ", 0)
+	mqtt.WARN = log.New(os.Stdout, "[WARN]  ", 0)
 
 	println("Connecting to: ", mqttURL)
 	c := mqtt.NewClient(opts)
