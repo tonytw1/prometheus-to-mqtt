@@ -37,10 +37,20 @@ func main() {
 		log.Print("Connected")
 	}
 
+	var logConnectionLost mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
+		log.Print("Connection lost")
+	}
+
+	var logReconnecting mqtt.ReconnectHandler = func(client mqtt.Client, opts *mqtt.ClientOptions) {
+		log.Print("Reconnecting")
+	}
+
 	opts := mqtt.NewClientOptions().AddBroker(mqttURL)
 	opts.SetKeepAlive(10 * time.Second)
 	opts.SetPingTimeout(10 * time.Second)
 	opts.SetOnConnectHandler(logConnection)
+	opts.SetConnectionLostHandler(logConnectionLost)
+	opts.SetReconnectingHandler(logReconnecting)
 	opts.SetCleanSession(true)
 	opts.SetClientID("prometheus-to-mqtt")
 	opts.SetAutoReconnect(true)
@@ -110,6 +120,5 @@ func formatMessage(job string, name string, value string) string {
 
 func publish(c mqtt.Client, topic string, message string) {
 	token := c.Publish(topic, 0, false, message)
-	outcome := token.WaitTimeout(time.Second*1) && token.Error() == nil
-	println(outcome)
+	token.WaitTimeout(time.Second * 1)
 }
