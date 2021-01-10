@@ -45,8 +45,6 @@ func main() {
 	}
 
 	opts := mqtt.NewClientOptions().AddBroker(mqttURL)
-	opts.SetKeepAlive(10 * time.Second)
-	opts.SetPingTimeout(10 * time.Second)
 	opts.SetOnConnectHandler(logConnection)
 	opts.SetConnectionLostHandler(logConnectionLost)
 	opts.SetReconnectingHandler(logReconnecting)
