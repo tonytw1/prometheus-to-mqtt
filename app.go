@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/eclipse/paho.mqtt.golang"
@@ -70,14 +69,14 @@ func main() {
 		// Publish metrics for each configured job
 		for _, job := range jobs {
 			// Metrics
-			println("Getting metrics for job: " + job)
+			//println("Getting metrics for job: " + job)
 			vectors, err := prometheus.GetMetrics(prometheusUrl, job)
 			if err != nil {
 				log.Print("Error getting metrics", err)
 				continue
 			}
 
-			println("Got vectors: " + strconv.FormatInt(int64(len(vectors)), 10))
+			//println("Got vectors: " + strconv.FormatInt(int64(len(vectors)), 10))
 			for _, instanceValue := range vectors {
 				name := instanceValue.Metric["__name__"]
 				value := instanceValue.Value[1].(string)
@@ -94,20 +93,20 @@ func main() {
 		}
 
 		for _, group := range ruleGroups {
-			job := group.Name
+			//job := group.Name
 			for _, rule := range group.Rules {
 				isAlertingRule := rule.Type == "alerting"
 				if !isAlertingRule {
 					continue
 				}
-				alertState := "false"
+				//alertState := "false"
 				for _, alert := range rule.Alerts {
 					if alert.State == "firing" {
-						alertState = "true"
+						//alertState = "true"
 						break
 					}
 				}
-				publish(c, topic, formatMessage(job, rule.Name, alertState))
+				//publish(c, topic, formatMessage(job, rule.Name, alertState))
 			}
 		}
 
