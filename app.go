@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/eclipse/paho.mqtt.golang"
@@ -63,6 +64,7 @@ func main() {
 				continue
 			}
 
+			println("Got vectors: " + strconv.FormatInt(int64(len(vectors)), 10))
 			for _, instanceValue := range vectors {
 				name := instanceValue.Metric["__name__"]
 				value := instanceValue.Value[1].(string)
