@@ -54,7 +54,7 @@ func main() {
 	mqtt.CRITICAL = log.New(os.Stdout, "[CRIT] ", 0)
 	mqtt.WARN = log.New(os.Stdout, "[WARN]  ", 0)
 
-	println("Connecting to: ", mqttURL)
+	log.Print("Connecting to: ", mqttURL)
 	c := mqtt.NewClient(opts)
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
@@ -62,7 +62,7 @@ func main() {
 	defer c.Disconnect(250)
 
 	for {
-		println("Polling")
+		log.Print("Polling")
 		// Publish metrics for each configured job
 		for _, job := range jobs {
 			// Metrics
