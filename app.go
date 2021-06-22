@@ -88,7 +88,6 @@ func main() {
 
 		for _, group := range ruleGroups {
 			groupName := group.Name
-			log.Print("Filtering groups rules for alerts: " + groupName)
 			for _, rule := range group.Rules {
 				isAlertingRule := rule.Type == "alerting"
 				if !isAlertingRule {
