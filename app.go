@@ -65,15 +65,12 @@ func main() {
 		log.Print("Polling")
 		// Publish metrics for each configured job
 		for _, job := range jobs {
-			// Metrics
-			//println("Getting metrics for job: " + job)
 			vectors, err := prometheus.GetMetrics(prometheusUrl, job)
 			if err != nil {
 				log.Print("Error getting metrics", err)
 				continue
 			}
 
-			//println("Got vectors: " + strconv.FormatInt(int64(len(vectors)), 10))
 			for _, instanceValue := range vectors {
 				name := instanceValue.Metric["__name__"]
 				value := instanceValue.Value[1].(string)
@@ -90,7 +87,8 @@ func main() {
 		}
 
 		for _, group := range ruleGroups {
-			job := group.Name
+			groupName := group.Name
+			log.Print("Filtering groups rules for alerts: " + groupName)
 			for _, rule := range group.Rules {
 				isAlertingRule := rule.Type == "alerting"
 				if !isAlertingRule {
@@ -103,7 +101,7 @@ func main() {
 						break
 					}
 				}
-				publish(c, topic, formatMessage(job, rule.Name, alertState))
+				publish(c, topic, formatMessage(groupName, rule.Name, alertState))
 			}
 		}
 
