@@ -74,7 +74,7 @@ func main() {
 			for _, instanceValue := range vectors {
 				name := instanceValue.Metric["__name__"]
 				value := instanceValue.Value[1].(string)
-				publish(c, topic, formatMessage(job, name.(string), value))
+				publish(c, topic+"/"+job, formatMessage(name.(string), value))
 			}
 
 		}
@@ -100,7 +100,7 @@ func main() {
 						break
 					}
 				}
-				publish(c, topic, formatMessage(groupName, rule.Name, alertState))
+				publish(c, topic+"/"+groupName, formatMessage(rule.Name, alertState))
 			}
 		}
 
@@ -110,8 +110,8 @@ func main() {
 	log.Print("End")
 }
 
-func formatMessage(job string, name string, value string) string {
-	return job + "_" + name + ":" + value // TODO make safe
+func formatMessage(name string, value string) string {
+	return name + ":" + value // TODO make safe
 }
 
 func publish(c mqtt.Client, topic string, message string) {
